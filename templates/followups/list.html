@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Follow-ups{% endblock %}
+{% block content %}
+<h3 class="mb-3">Follow-ups</h3>
+<ul class="nav nav-tabs mb-3">
+  {% for key, label in tabs %}
+  {% endfor %}
+  <li class="nav-item"><a class="nav-link {% if tab == 'open' %}active{% endif %}" href="?tab=open">Open</a></li>
+  <li class="nav-item"><a class="nav-link {% if tab == 'today' %}active{% endif %}" href="?tab=today">Due Today</a></li>
+  <li class="nav-item"><a class="nav-link {% if tab == 'overdue' %}active{% endif %}" href="?tab=overdue">Overdue</a></li>
+  <li class="nav-item"><a class="nav-link {% if tab == 'done' %}active{% endif %}" href="?tab=done">Completed</a></li>
+  <li class="nav-item"><a class="nav-link {% if tab == 'all' %}active{% endif %}" href="?tab=all">All</a></li>
+</ul>
+
+<div class="card">
+<table class="table table-hover mb-0">
+  <thead><tr><th>Lead</th><th>Type</th><th>Subject</th><th>Due</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for a in activities %}
+    <tr>
+      <td><a href="{% url 'lead_detail' a.lead.pk %}">{{ a.lead.name }}</a></td>
+      <td>{{ a.get_activity_type_display }}</td>
+      <td>{{ a.subject }}</td>
+      <td>{{ a.due_at|date:"Y-m-d H:i"|default:"—" }}</td>
+      <td>
+        {% if a.completed %}<span class="badge bg-success">Done</span>
+        {% elif a.is_overdue %}<span class="badge bg-danger">Overdue</span>
+        {% else %}<span class="badge bg-secondary">Open</span>{% endif %}
+      </td>
+      <td>{% if not a.completed %}<a href="{% url 'activity_complete' a.pk %}" class="btn btn-sm btn-outline-success">Mark Done</a>{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="6" class="text-center text-muted py-4">No follow-ups.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

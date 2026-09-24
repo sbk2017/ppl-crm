@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="m-0">Users</h3>
+  <a href="{% url 'user_create' %}" class="btn btn-primary">Add User</a>
+</div>
+<div class="card">
+<table class="table mb-0">
+  <thead><tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Active</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.get_full_name }}</td>
+      <td>{{ u.email }}</td>
+      <td><span class="badge bg-{% if u.profile.is_admin %}primary{% else %}secondary{% endif %}">{{ u.profile.get_role_display }}</span></td>
+      <td>{% if u.is_active %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-danger">No</span>{% endif %}</td>
+      <td><a href="{% url 'user_edit' u.pk %}" class="btn btn-sm btn-outline-primary">Edit</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

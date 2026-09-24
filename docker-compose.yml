@@ -1,0 +1,11 @@
+services:
+  crm:
+    build: .
+    container_name: ppl-crm
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    # For Dokploy: the platform will mount a named volume at /app/data.

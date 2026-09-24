@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4">Dashboard</h3>
+
+<div class="row g-3 mb-4">
+  {% for label, value in tiles %}
+  {% endfor %}
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Total Leads</div><div class="value">{{ total }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Open</div><div class="value">{{ open_leads }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Won</div><div class="value text-success">{{ won }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Lost</div><div class="value text-danger">{{ lost }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Conversion Rate</div><div class="value">{{ conversion }}%</div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Overdue Follow-ups</div><div class="value text-danger">{{ overdue }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Due Today</div><div class="value text-warning">{{ due_today }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card stat-card p-3"><div class="text-muted small">Meetings Scheduled</div><div class="value">{{ meetings }}</div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4"><div class="card p-3"><h6>Leads by Stage</h6><canvas id="stageChart"></canvas></div></div>
+  <div class="col-md-4"><div class="card p-3"><h6>Leads by Source</h6><canvas id="sourceChart"></canvas></div></div>
+  <div class="col-md-4"><div class="card p-3"><h6>Leads by Assigned Employee</h6><canvas id="ownerChart"></canvas></div></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const stageData = {{ by_stage|safe }};
+const sourceData = {{ by_source|safe }};
+const ownerData = {{ by_owner|safe }};
+
+function mkChart(id, data, labelKey, color) {
+  const labels = data.map(d => d[labelKey] || "(none)");
+  const values = data.map(d => d.c);
+  new Chart(document.getElementById(id), {
+    type: "doughnut",
+    data: { labels, datasets: [{ data: values, backgroundColor: [
+      "#0b1f3a","#1d4ed8","#c8a24a","#3b82f6","#94a3b8","#f59e0b","#ef4444","#10b981"
+    ]}]},
+    options: { plugins: { legend: { position: "bottom" } } }
+  });
+}
+mkChart("stageChart", stageData, "stage");
+mkChart("sourceChart", sourceData, "source");
+mkChart("ownerChart", ownerData, "owner__username");
+</script>
+{% endblock %}

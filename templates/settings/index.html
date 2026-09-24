@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h3 class="mb-3">Settings</h3>
+
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card p-3">
+      <h6>Add Dropdown Option</h6>
+      <form method="post">{% csrf_token %}
+        {% for f in form %}
+          <div class="mb-2"><label class="form-label small">{{ f.label }}</label>{{ f }}</div>
+        {% endfor %}
+        <button class="btn btn-primary btn-sm">Add</button>
+      </form>
+    </div>
+
+    <div class="card p-3 mt-3">
+      <h6>Backups</h6>
+      <a href="{% url 'backup_create' %}" class="btn btn-gold btn-sm mb-2">Create Backup</a>
+      <a href="{% url 'backup_list' %}" class="btn btn-outline-secondary btn-sm">View Backups</a>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card p-3">
+      <h6>Dropdown Options</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Category</th><th>Value</th><th>Active</th><th></th></tr></thead>
+        <tbody>
+        {% for o in options %}
+          <tr>
+            <td>{{ o.get_category_display }}</td>
+            <td>{{ o.value }}</td>
+            <td>{% if o.active %}Yes{% else %}No{% endif %}</td>
+            <td><a href="{% url 'option_delete' o.pk %}" class="btn btn-sm btn-outline-danger">Delete</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<style>input,select{display:block;width:100%;padding:.375rem .75rem;border:1px solid #ced4da;border-radius:.375rem;}</style>
+{% endblock %}

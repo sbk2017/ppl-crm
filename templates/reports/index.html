@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h3 class="mb-3">Reports</h3>
+
+<div class="card p-3 mb-3">
+  <strong>Total Pipeline Value:</strong> {{ total_value }}
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6"><div class="card p-3"><h6>By Status</h6>
+    <table class="table table-sm"><thead><tr><th>Status</th><th>Count</th></tr></thead>
+      <tbody>{% for r in by_status %}<tr><td>{{ r.status }}</td><td>{{ r.c }}</td></tr>{% endfor %}</tbody></table>
+  </div></div>
+  <div class="col-md-6"><div class="card p-3"><h6>By Stage</h6>
+    <table class="table table-sm"><thead><tr><th>Stage</th><th>Count</th></tr></thead>
+      <tbody>{% for r in by_stage %}<tr><td>{{ r.stage|default:"—" }}</td><td>{{ r.c }}</td></tr>{% endfor %}</tbody></table>
+  </div></div>
+  <div class="col-md-6"><div class="card p-3"><h6>By Contact Source</h6>
+    <table class="table table-sm"><thead><tr><th>Source</th><th>Count</th></tr></thead>
+      <tbody>{% for r in by_source %}<tr><td>{{ r.source|default:"—" }}</td><td>{{ r.c }}</td></tr>{% endfor %}</tbody></table>
+  </div></div>
+  <div class="col-md-6"><div class="card p-3"><h6>By Assigned Employee</h6>
+    <table class="table table-sm"><thead><tr><th>Employee</th><th>Count</th></tr></thead>
+      <tbody>{% for r in by_owner %}<tr><td>{{ r.owner__username|default:"—" }}</td><td>{{ r.c }}</td></tr>{% endfor %}</tbody></table>
+  </div></div>
+</div>
+{% endblock %}

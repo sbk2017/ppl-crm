@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Leads{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="m-0">Leads</h3>
+  <div>
+    <a href="{% url 'lead_add' %}" class="btn btn-primary"><i class="bi bi-plus"></i> Add Lead</a>
+    <a href="{% url 'export_leads' 'xlsx' %}" class="btn btn-outline-secondary">Export XLSX</a>
+    <a href="{% url 'export_leads' 'csv' %}" class="btn btn-outline-secondary">Export CSV</a>
+    {% if user.profile.is_admin %}<a href="{% url 'import_leads' %}" class="btn btn-outline-secondary">Import</a>{% endif %}
+  </div>
+</div>
+
+<form class="card p-3 mb-3" method="get">
+  <div class="row g-2">
+    <div class="col-md-3"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search name, company, email..."></div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">All Status</option>
+        <option value="open" {% if status == 'open' %}selected{% endif %}>Open</option>
+        <option value="won" {% if status == 'won' %}selected{% endif %}>Won</option>
+        <option value="lost" {% if status == 'lost' %}selected{% endif %}>Lost</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="stage" class="form-select">
+        <option value="">All Stages</option>
+        {% for s in stages %}<option value="{{ s.value }}" {% if stage == s.value %}selected{% endif %}>{{ s.value }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="source" class="form-select">
+        <option value="">All Sources</option>
+        {% for s in sources %}<option value="{{ s.value }}" {% if source == s.value %}selected{% endif %}>{{ s.value }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="owner" class="form-select">
+        <option value="">All Owners</option>
+        {% for o in owners %}<option value="{{ o.id }}" {% if owner == o.id|stringformat:"s" %}selected{% endif %}>{{ o.username }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1"><button class="btn btn-primary w-100">Filter</button></div>
+  </div>
+</form>
+
+<div class="card">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Name</th><th>Company</th><th>Stage</th><th>Status</th><th>Owner</th><th>Value</th><th>Updated</th></tr></thead>
+  <tbody>
+  {% for l in leads %}
+    <tr>
+      <td><a href="{% url 'lead_detail' l.pk %}">{{ l.name }}</a></td>
+      <td>{{ l.company }}</td>
+      <td>{{ l.stage }}</td>
+      <td><span class="badge bg-{% if l.status == 'won' %}success{% elif l.status == 'lost' %}danger{% else %}secondary{% endif %}">{{ l.get_status_display }}</span></td>
+      <td>{{ l.owner.username|default:"—" }}</td>
+      <td>{{ l.value }}</td>
+      <td>{{ l.updated_at|date:"Y-m-d H:i" }}</td>
+    </tr>
+  {% empty %}<tr><td colspan="7" class="text-center text-muted py-4">No leads found.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

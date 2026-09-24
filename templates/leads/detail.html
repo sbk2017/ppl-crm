@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ lead.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="m-0">{{ lead.name }} <small class="text-muted">{{ lead.company }}</small></h3>
+  <div>
+    <a href="{% url 'lead_edit' lead.pk %}" class="btn btn-primary">Edit</a>
+    {% if user.profile.is_admin %}<a href="{% url 'lead_archive' lead.pk %}" class="btn btn-outline-danger" onclick="return confirm('Archive this lead?')">Archive</a>{% endif %}
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card p-3">
+      <h6 class="text-muted">Lead Details</h6>
+      <table class="table table-sm mb-0">
+        <tr><th>Status</th><td><span class="badge bg-{% if lead.status == 'won' %}success{% elif lead.status == 'lost' %}danger{% else %}secondary{% endif %}">{{ lead.get_status_display }}</span></td></tr>
+        <tr><th>Stage</th><td>{{ lead.stage|default:"—" }}</td></tr>
+        <tr><th>Source</th><td>{{ lead.source|default:"—" }}</td></tr>
+        <tr><th>Email</th><td>{{ lead.email|default:"—" }}</td></tr>
+        <tr><th>Phone</th><td>{{ lead.phone|default:"—" }}</td></tr>
+        <tr><th>Owner</th><td>{{ lead.owner.username|default:"—" }}</td></tr>
+        <tr><th>Value</th><td>{{ lead.value }}</td></tr>
+        <tr><th>Created By</th><td>{{ lead.created_by.username|default:"—" }} ({{ lead.created_at|date:"Y-m-d H:i" }})</td></tr>
+        <tr><th>Updated By</th><td>{{ lead.updated_by.username|default:"—" }} ({{ lead.updated_at|date:"Y-m-d H:i" }})</td></tr>
+      </table>
+      {% if lead.notes %}<hr><p class="mb-0">{{ lead.notes|linebreaks }}</p>{% endif %}
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card p-3 mb-3">
+      <h6>Add Follow-up / Activity</h6>
+      <form method="post">{% csrf_token %}
+        <div class="row g-2">
+          {% for f in aform %}
+            <div class="col-md-6"><label class="form-label small">{{ f.label }}</label>{{ f }}</div>
+          {% endfor %}
+        </div>
+        <button name="add_activity" class="btn btn-primary mt-3 btn-sm">Add Activity</button>
+      </form>
+    </div>
+
+    <div class="card p-3">
+      <h6>Activity History</h6>
+      <ul class="list-group list-group-flush">
+        {% for a in activities %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ a.get_activity_type_display }}:</strong> {{ a.subject }}
+              {% if a.due_at %}<div class="small text-muted">Due: {{ a.due_at|date:"Y-m-d H:i" }}</div>{% endif %}
+              {% if a.notes %}<div class="small">{{ a.notes }}</div>{% endif %}
+              <div class="small text-muted">by {{ a.created_by.username|default:"—" }} on {{ a.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+            <div>
+              {% if a.completed %}<span class="badge bg-success">Done</span>
+              {% elif a.is_overdue %}<span class="badge bg-danger">Overdue</span>
+              <a href="{% url 'activity_complete' a.pk %}" class="btn btn-sm btn-outline-success ms-1">Mark Done</a>
+              {% else %}<span class="badge bg-secondary">Open</span>
+              <a href="{% url 'activity_complete' a.pk %}" class="btn btn-sm btn-outline-success ms-1">Mark Done</a>{% endif %}
+            </div>
+          </li>
+        {% empty %}<li class="list-group-item text-muted">No activities yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<style>input,select,textarea{display:block;width:100%;padding:.375rem .75rem;border:1px solid #ced4da;border-radius:.375rem;}</style>
+{% endblock %}

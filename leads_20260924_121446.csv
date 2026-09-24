@@ -1,0 +1,5 @@
+ID,Name,Company,Email,Phone,Status,Stage,Source,Owner,Value,Created At
+4,Falcon Freight,Falcon Freight,sales@falcon.com,+971500000004,lost,Negotiation,Cold Call,sales1,20000.00,2026-09-24 07:49:10.691579+00:00
+5,Gulf Cargo Co,Gulf Cargo,info@gulfcargo.com,+971500000005,won,Closed,Walk-in,sales1,15000.00,2026-09-24 07:49:10.703983+00:00
+3,Desert Traders,Desert Traders,hello@desert.com,+971500000003,open,Proposal,Email,sales1,8000.00,2026-09-24 07:49:10.679421+00:00
+1,Acme Logistics,Acme LLC,info@acme.com,+971500000001,open,New,Website,sales1,5000.00,2026-09-24 07:49:10.655881+00:00
