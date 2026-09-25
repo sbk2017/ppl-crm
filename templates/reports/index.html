@@ -2,7 +2,32 @@
 {% block title %}Reports{% endblock %}
 {% block content %}
 <h3 class="mb-3">Reports</h3>
-
+<form method="get" class="card p-3 mb-3">
+  <div class="row g-2">
+    <div class="col-md-3">
+      <select name="country" class="form-select">
+        <option value="">All Countries</option>
+        {% for c in countries %}
+          <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select name="city" class="form-select">
+        <option value="">All Cities</option>
+        {% for c in cities %}
+          <option value="{{ c }}" {% if city == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">Apply</button>
+    </div>
+    <div class="col-md-2">
+      <a href="{% url 'reports' %}" class="btn btn-outline-secondary w-100">Reset</a>
+    </div>
+  </div>
+</form>
 <div class="card p-3 mb-3">
   <strong>Total Pipeline Value:</strong> {{ total_value }}
 </div>
@@ -24,5 +49,36 @@
     <table class="table table-sm"><thead><tr><th>Employee</th><th>Count</th></tr></thead>
       <tbody>{% for r in by_owner %}<tr><td>{{ r.owner__username|default:"—" }}</td><td>{{ r.c }}</td></tr>{% endfor %}</tbody></table>
   </div></div>
+  <div class="col-md-6">
+  <div class="card p-3">
+    <h6>Leads by Country</h6>
+    <table class="table table-sm mb-0">
+      <thead><tr><th>Country</th><th>Count</th></tr></thead>
+      <tbody>
+        {% for r in by_country %}
+          <tr><td>{{ r.country }}</td><td>{{ r.c }}</td></tr>
+        {% empty %}
+          <tr><td colspan="2" class="text-muted">No data.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="col-md-6">
+  <div class="card p-3">
+    <h6>Leads by City</h6>
+    <table class="table table-sm mb-0">
+      <thead><tr><th>City</th><th>Count</th></tr></thead>
+      <tbody>
+        {% for r in by_city %}
+          <tr><td>{{ r.city }}</td><td>{{ r.c }}</td></tr>
+        {% empty %}
+          <tr><td colspan="2" class="text-muted">No data.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 </div>
 {% endblock %}

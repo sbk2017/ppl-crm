@@ -16,11 +16,17 @@ def export_leads_xlsx(leads, path: Path):
     headers = ["ID", "Name", "Company", "Email", "Phone", "Status", "Stage",
                "Source", "Owner", "Value", "Created By", "Updated By",
                "Created At", "Updated At", "Notes"]
-    ws.append(headers)
+    ws.append(["ID", "Name", "Company", "Email", "Phone",
+           "Country", "City",                              # NEW
+           "Status", "Stage", "Source", "Owner", "Value",
+           "Created By", "Updated By", "Created At", "Updated At", "Notes"])
+
     for l in leads:
         ws.append([
-            l.id, l.name, l.company, l.email, l.phone, l.status, l.stage,
-            l.source, l.owner.username if l.owner else "",
+            l.id, l.name, l.company, l.email, l.phone,
+            l.country, l.city,                                 # NEW
+            l.status, l.stage, l.source,
+            l.owner.username if l.owner else "",
             float(l.value or 0),
             l.created_by.username if l.created_by else "",
             l.updated_by.username if l.updated_by else "",
@@ -58,9 +64,12 @@ def import_leads_xlsx(file_obj, user):
                 company=str(row[idx["company"]] or "") if "company" in idx else "",
                 email=str(row[idx["email"]] or "") if "email" in idx else "",
                 phone=str(row[idx["phone"]] or "") if "phone" in idx else "",
+                country=str(row[idx["country"]] or "") if "country" in idx else "",   # NEW
+                city=str(row[idx["city"]] or "") if "city" in idx else "",           # NEW
                 stage=str(row[idx["stage"]] or "") if "stage" in idx else "",
                 source=str(row[idx["source"]] or "") if "source" in idx else "",
-                value=float(row[idx["value"]] or 0) if "value" in idx and row[idx["value"]] not in (None, "") else 0,
+                value=float(row[idx["value"]] or 0)
+                    if "value" in idx and row[idx["value"]] not in (None, "") else 0,
                 owner=owner,
                 created_by=user,
                 updated_by=user,

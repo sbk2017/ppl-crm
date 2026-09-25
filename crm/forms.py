@@ -6,12 +6,18 @@ from .models import Lead, Activity, DropdownOption
 class LeadForm(forms.ModelForm):
     class Meta:
         model = Lead
-        fields = ["name", "company", "email", "phone", "status", "stage",
-                  "source", "owner", "value", "notes"]
+        fields = [
+            "name", "company", "email", "phone",
+            "country", "city",                       # NEW
+            "status", "stage", "source", "owner",
+            "value", "notes",
+        ]
         widgets = {
             "notes": forms.Textarea(attrs={"rows": 3}),
             "stage": forms.TextInput(),
             "source": forms.TextInput(),
+            "country": forms.TextInput(attrs={"placeholder": "e.g. United Arab Emirates"}),
+            "city": forms.TextInput(attrs={"placeholder": "e.g. Dubai"}),
         }
 
     def __init__(self, *args, user=None, **kwargs):
@@ -27,7 +33,15 @@ class LeadForm(forms.ModelForm):
             self.fields["stage"] = forms.ChoiceField(choices=[("", "---------")] + [(s, s) for s in stages], required=False)
         if sources:
             self.fields["source"] = forms.ChoiceField(choices=[("", "---------")] + [(s, s) for s in sources], required=False)
+        countries = list(DropdownOption.objects.filter(category="country", active=True).values_list("value", flat=True))
+        cities    = list(DropdownOption.objects.filter(category="city",    active=True).values_list("value", flat=True))
 
+        if countries:
+            self.fields["country"] = forms.ChoiceField(
+                choices=[("", "---------")] + [(c, c) for c in countries], required=False)
+        if cities:
+            self.fields["city"] = forms.ChoiceField(
+                choices=[("", "---------")] + [(c, c) for c in cities], required=False)
 
 class ActivityForm(forms.ModelForm):
     class Meta:

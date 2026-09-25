@@ -23,6 +23,8 @@
         <tr><th>Value</th><td>{{ lead.value }}</td></tr>
         <tr><th>Created By</th><td>{{ lead.created_by.username|default:"—" }} ({{ lead.created_at|date:"Y-m-d H:i" }})</td></tr>
         <tr><th>Updated By</th><td>{{ lead.updated_by.username|default:"—" }} ({{ lead.updated_at|date:"Y-m-d H:i" }})</td></tr>
+        <tr><th>Country</th><td>{{ lead.country|default:"—" }}</td></tr>
+        <tr><th>City</th><td>{{ lead.city|default:"—" }}</td></tr>
       </table>
       {% if lead.notes %}<hr><p class="mb-0">{{ lead.notes|linebreaks }}</p>{% endif %}
     </div>

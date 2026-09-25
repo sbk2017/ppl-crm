@@ -9,6 +9,8 @@ class DropdownOption(models.Model):
         ("stage", "Stage"),
         ("source", "Contact Source"),
         ("status", "Status"),
+        ("country", "Country"),
+        ("city",    "City"),  
     ]
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     value = models.CharField(max_length=100)
@@ -30,11 +32,14 @@ class Lead(models.Model):
         ("lost", "Closed - Lost"),
     ]
 
-    # Core fields
     name = models.CharField(max_length=200)
     company = models.CharField(max_length=200, blank=True)
     email = models.EmailField(blank=True)
     phone = models.CharField(max_length=50, blank=True)
+
+    # NEW FIELDS
+    country = models.CharField(max_length=100, blank=True, db_index=True)
+    city = models.CharField(max_length=100, blank=True, db_index=True)
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="open")
     stage = models.CharField(max_length=100, blank=True)
@@ -58,10 +63,6 @@ class Lead(models.Model):
 
     def __str__(self):
         return self.name
-
-    @property
-    def next_followup(self):
-        return self.activities.filter(completed=False).order_by("due_at").first()
 
 
 class Activity(models.Model):

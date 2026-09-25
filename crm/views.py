@@ -67,28 +67,41 @@ def lead_list(request):
     stage = request.GET.get("stage", "")
     source = request.GET.get("source", "")
     owner = request.GET.get("owner", "")
+    country = request.GET.get("country", "")   # NEW
+    city = request.GET.get("city", "")         # NEW
 
     if q:
-        qs = qs.filter(Q(name__icontains=q) | Q(company__icontains=q) |
-                       Q(email__icontains=q) | Q(phone__icontains=q))
-    if status:
-        qs = qs.filter(status=status)
-    if stage:
-        qs = qs.filter(stage=stage)
-    if source:
-        qs = qs.filter(source=source)
-    if owner:
-        qs = qs.filter(owner_id=owner)
+        qs = qs.filter(
+            Q(name__icontains=q) | Q(company__icontains=q) |
+            Q(email__icontains=q) | Q(phone__icontains=q) |
+            Q(country__icontains=q) | Q(city__icontains=q)      # include in search
+        )
+    if status:  qs = qs.filter(status=status)
+    if stage:   qs = qs.filter(stage=stage)
+    if source:  qs = qs.filter(source=source)
+    if owner:   qs = qs.filter(owner_id=owner)
+    if country: qs = qs.filter(country=country)                 # NEW
+    if city:    qs = qs.filter(city=city)                       # NEW
 
-    context = {
+    # Distinct values for the dropdowns
+    countries = (Lead.objects.filter(archived=False)
+                 .exclude(country="")
+                 .values_list("country", flat=True)
+                 .distinct().order_by("country"))
+    cities = (Lead.objects.filter(archived=False)
+              .exclude(city="")
+              .values_list("city", flat=True)
+              .distinct().order_by("city"))
+
+    return render(request, "leads/list.html", {
         "leads": qs,
         "q": q, "status": status, "stage": stage, "source": source, "owner": owner,
+        "country": country, "city": city,                        # NEW
+        "countries": countries, "cities": cities,                # NEW
         "stages": DropdownOption.objects.filter(category="stage", active=True),
         "sources": DropdownOption.objects.filter(category="source", active=True),
         "owners": User.objects.filter(is_active=True, profile__active=True),
-    }
-    return render(request, "leads/list.html", context)
-
+    })
 
 @login_required
 def lead_add(request):
@@ -198,14 +211,39 @@ def activity_complete(request, pk):
 @login_required
 def reports(request):
     qs = sales_only_or_admin(Lead.objects.filter(archived=False), request.user)
-    by_status = list(qs.values("status").annotate(c=Count("id")))
-    by_stage = list(qs.values("stage").annotate(c=Count("id")).order_by("-c"))
-    by_source = list(qs.values("source").annotate(c=Count("id")).order_by("-c"))
-    by_owner = list(qs.values("owner__username").annotate(c=Count("id")).order_by("-c"))
+
+    # New filters
+    country = request.GET.get("country", "")
+    city    = request.GET.get("city", "")
+    if country: qs = qs.filter(country=country)
+    if city:    qs = qs.filter(city=city)
+
+    by_status  = list(qs.values("status").annotate(c=Count("id")))
+    by_stage   = list(qs.values("stage").annotate(c=Count("id")).order_by("-c"))
+    by_source  = list(qs.values("source").annotate(c=Count("id")).order_by("-c"))
+    by_owner   = list(qs.values("owner__username").annotate(c=Count("id")).order_by("-c"))
+    by_country = list(qs.exclude(country="").values("country").annotate(c=Count("id")).order_by("-c"))
+    by_city    = list(qs.exclude(city="").values("city").annotate(c=Count("id")).order_by("-c"))
+
     total_value = qs.aggregate(s=Sum("value"))["s"] or 0
+
+    countries = (Lead.objects.filter(archived=False)
+                 .exclude(country="")
+                 .values_list("country", flat=True).distinct().order_by("country"))
+    cities = (Lead.objects.filter(archived=False)
+              .exclude(city="")
+              .values_list("city", flat=True).distinct().order_by("city"))
+
     return render(request, "reports/index.html", {
-        "by_status": by_status, "by_stage": by_stage, "by_source": by_source,
-        "by_owner": by_owner, "total_value": total_value,
+        "by_status": by_status,
+        "by_stage": by_stage,
+        "by_source": by_source,
+        "by_owner": by_owner,
+        "by_country": by_country,   # NEW
+        "by_city": by_city,         # NEW
+        "total_value": total_value,
+        "country": country, "city": city,
+        "countries": countries, "cities": cities,
     })
 
 
